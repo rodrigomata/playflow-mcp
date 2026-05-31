@@ -132,5 +132,51 @@ class PlayFlowClient:
     def get_upload_version(self) -> Any:
         return self._request("POST", "/get_upload_version")
 
+    # --- monitoring ------------------------------------------------------
+
+    def get_server_logs(self, match_id: str) -> Any:
+        return self._request("POST", "/get_server_logs", headers={"match-id": match_id})
+
+    def get_performance_metrics(self, match_id: str) -> Any:
+        return self._request(
+            "GET", "/get_performance_metrics", headers={"match-id": match_id}
+        )
+
+    # --- builds & tags ---------------------------------------------------
+
+    def upload_server_files(self, file_path: str, server_tag: str | None = None) -> Any:
+        with open(file_path, "rb") as handle:
+            return self._request(
+                "POST",
+                "/upload_server_files",
+                headers={"server-tag": server_tag},
+                files={"file": handle},
+            )
+
+    def list_server_tags(self) -> Any:
+        return self._request("GET", "/server_tags")
+
+    def delete_server_tag(self, server_tag: str) -> Any:
+        return self._request("DELETE", "/server_tags", headers={"server-tag": server_tag})
+
+    # --- players & matchmaking ------------------------------------------
+
+    def add_player(self, match_id: str, ticket_id: str) -> Any:
+        return self._request(
+            "POST", "/players/add", params={"match_id": match_id, "ticket_id": ticket_id}
+        )
+
+    def remove_player(self, match_id: str, ticket_id: str) -> Any:
+        return self._request(
+            "POST",
+            "/players/remove",
+            params={"match_id": match_id, "ticket_id": ticket_id},
+        )
+
+    def run_workflow(self, authorization: str | None = None) -> Any:
+        return self._request(
+            "POST", "/get_workflow", headers={"authorization": authorization}
+        )
+
     def close(self) -> None:
         self._http.close()
