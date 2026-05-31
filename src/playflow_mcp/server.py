@@ -118,6 +118,78 @@ def stop_game_server(match_id: str, confirm: bool = False) -> dict[str, Any]:
     return _call(get_client().stop_game_server, match_id)
 
 
+# --- monitoring ----------------------------------------------------------
+
+@mcp.tool()
+def get_server_logs(match_id: str) -> dict[str, Any]:
+    """Fetch logs for a running server / match by match_id."""
+    return _call(get_client().get_server_logs, match_id)
+
+
+@mcp.tool()
+def get_performance_metrics(match_id: str) -> dict[str, Any]:
+    """Fetch CPU/memory/performance metrics for a running server by match_id."""
+    return _call(get_client().get_performance_metrics, match_id)
+
+
+# --- builds & tags -------------------------------------------------------
+
+@mcp.tool()
+def upload_server_files(
+    file_path: str, server_tag: str | None = None, confirm: bool = False
+) -> dict[str, Any]:
+    """Upload a built server image (zip) to PlayFlow under an optional tag.
+
+    DESTRUCTIVE: overwrites the image for the given tag. Pass confirm=True to proceed.
+    """
+    if not confirm:
+        return _needs_confirmation("upload_server_files", server_tag or "<default tag>")
+    return _call(get_client().upload_server_files, file_path, server_tag)
+
+
+@mcp.tool()
+def list_server_tags() -> dict[str, Any]:
+    """List all server image tags available on the current plan."""
+    return _call(get_client().list_server_tags)
+
+
+@mcp.tool()
+def delete_server_tag(server_tag: str, confirm: bool = False) -> dict[str, Any]:
+    """Delete a server image tag.
+
+    DESTRUCTIVE: removes the tagged image. Pass confirm=True to proceed.
+    """
+    if not confirm:
+        return _needs_confirmation("delete_server_tag", server_tag)
+    return _call(get_client().delete_server_tag, server_tag)
+
+
+@mcp.tool()
+def get_upload_version() -> dict[str, Any]:
+    """Get the current server-image upload version information."""
+    return _call(get_client().get_upload_version)
+
+
+# --- players & matchmaking ----------------------------------------------
+
+@mcp.tool()
+def add_player(match_id: str, ticket_id: str) -> dict[str, Any]:
+    """Add a player (by matchmaking ticket_id) to a match."""
+    return _call(get_client().add_player, match_id=match_id, ticket_id=ticket_id)
+
+
+@mcp.tool()
+def remove_player(match_id: str, ticket_id: str) -> dict[str, Any]:
+    """Remove a player (by matchmaking ticket_id) from a match."""
+    return _call(get_client().remove_player, match_id=match_id, ticket_id=ticket_id)
+
+
+@mcp.tool()
+def run_workflow(authorization: str | None = None) -> dict[str, Any]:
+    """Execute the configured PlayFlow workflow, with an optional authorization header."""
+    return _call(get_client().run_workflow, authorization)
+
+
 def main() -> None:
     """Console entry point: run the MCP server over stdio."""
     mcp.run()

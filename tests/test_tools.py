@@ -69,3 +69,38 @@ def test_stop_with_confirm_calls_client(monkeypatch):
     out = server.stop_game_server("m1", confirm=True)
     assert out["ok"] is True
     assert ("stop_game_server", "m1") in fake.calls
+
+
+def test_get_server_logs_passes_through(monkeypatch):
+    use_fake(monkeypatch)
+    out = server.get_server_logs("m1")
+    assert out["ok"] is True
+    assert out["data"]["logs"] == "l1\nl2"
+
+
+def test_delete_tag_requires_confirmation(monkeypatch):
+    fake = use_fake(monkeypatch)
+    out = server.delete_server_tag("prod")
+    assert out["error"] == "confirmation_required"
+    assert fake.calls == []
+
+
+def test_upload_requires_confirmation(monkeypatch):
+    fake = use_fake(monkeypatch)
+    out = server.upload_server_files("/tmp/x.zip")
+    assert out["error"] == "confirmation_required"
+    assert fake.calls == []
+
+
+def test_upload_with_confirm_calls_client(monkeypatch):
+    fake = use_fake(monkeypatch)
+    out = server.upload_server_files("/tmp/x.zip", server_tag="prod", confirm=True)
+    assert out["ok"] is True
+    assert ("upload_server_files", "/tmp/x.zip", "prod") in fake.calls
+
+
+def test_add_player_passes_through(monkeypatch):
+    fake = use_fake(monkeypatch)
+    out = server.add_player(match_id="m1", ticket_id="t1")
+    assert out["ok"] is True
+    assert ("add_player", "m1", "t1") in fake.calls
