@@ -28,5 +28,14 @@ def load_config() -> Config:
             "PlayFlow API token, or export PLAYFLOW_API_TOKEN in your environment."
         )
     base_url = os.environ.get("PLAYFLOW_BASE_URL", DEFAULT_BASE_URL).rstrip("/")
-    timeout = float(os.environ.get("PLAYFLOW_TIMEOUT", DEFAULT_TIMEOUT))
+    raw_timeout = os.environ.get("PLAYFLOW_TIMEOUT")
+    if raw_timeout is None:
+        timeout = DEFAULT_TIMEOUT
+    else:
+        try:
+            timeout = float(raw_timeout)
+        except ValueError as exc:
+            raise ConfigError(
+                f"PLAYFLOW_TIMEOUT must be a number, got {raw_timeout!r}."
+            ) from exc
     return Config(api_token=token, base_url=base_url, timeout=timeout)

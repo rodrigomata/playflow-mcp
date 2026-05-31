@@ -28,3 +28,11 @@ def test_load_config_missing_token_raises(monkeypatch):
     with pytest.raises(ConfigError) as exc:
         load_config()
     assert "PLAYFLOW_API_TOKEN" in str(exc.value)
+
+
+def test_load_config_invalid_timeout_raises(monkeypatch):
+    monkeypatch.setenv("PLAYFLOW_API_TOKEN", "tok-123")
+    monkeypatch.setenv("PLAYFLOW_TIMEOUT", "not-a-number")
+    with pytest.raises(ConfigError) as exc:
+        load_config()
+    assert "PLAYFLOW_TIMEOUT" in str(exc.value)

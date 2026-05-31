@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import Any, Callable
 
+import httpx
 from mcp.server.fastmcp import FastMCP
 
 from .client import PlayFlowAPIError, PlayFlowClient
@@ -32,6 +33,11 @@ def _call(fn: Callable[..., Any], *args: Any, **kwargs: Any) -> dict[str, Any]:
             "status": exc.status,
             "detail": exc.detail,
         }
+    except (httpx.HTTPError, OSError) as exc:
+        # Network failures (timeout, DNS, connection refused) and local file
+        # errors (e.g. a missing upload path) surface as actionable text rather
+        # than an uncaught traceback.
+        return {"ok": False, "error": "request_failed", "detail": str(exc)}
 
 
 def _needs_confirmation(action: str, target: str) -> dict[str, Any]:
