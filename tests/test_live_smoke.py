@@ -5,9 +5,11 @@ import pytest
 from playflow_mcp.client import PlayFlowClient
 from playflow_mcp.config import load_config
 
+_has_key = bool(os.environ.get("PLAYFLOW_API_KEY") or os.environ.get("PLAYFLOW_API_TOKEN"))
+
 pytestmark = pytest.mark.skipif(
-    not (os.environ.get("PLAYFLOW_API_TOKEN") and os.environ.get("PLAYFLOW_LIVE_TESTS") == "1"),
-    reason="set PLAYFLOW_API_TOKEN and PLAYFLOW_LIVE_TESTS=1 to run live smoke tests",
+    not (_has_key and os.environ.get("PLAYFLOW_LIVE_TESTS") == "1"),
+    reason="set PLAYFLOW_API_KEY and PLAYFLOW_LIVE_TESTS=1 to run live smoke tests",
 )
 
 

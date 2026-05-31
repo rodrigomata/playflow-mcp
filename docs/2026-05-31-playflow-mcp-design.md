@@ -1,8 +1,35 @@
 # PlayFlow MCP Server — Design
 
 **Date:** 2026-05-31
-**Status:** Approved (brainstorming complete, pre-implementation)
+**Status:** Implemented — **retargeted to the PlayFlow v3 API** (see "v3 revision" below)
 **Repo:** `/Users/rodrigomata/Documents/Development/playflow-mcp` (standalone)
+
+> ## ⚠️ v3 revision (supersedes the legacy specifics below)
+>
+> The original design targeted the legacy API at `api.cloud.playflow.app` with a `token`
+> header and RPC-style endpoints. That is an older API generation. The MCP was retargeted to
+> the **current PlayFlow v3 API**:
+>
+> - **Base URL:** `https://api.computeflow.cloud` (paths under `/api/v3`); overridable via
+>   `PLAYFLOW_BASE_URL`.
+> - **Auth header:** `api-key` (server key `pf_...`), from `PLAYFLOW_API_KEY`
+>   (legacy `PLAYFLOW_API_TOKEN` still accepted as a fallback).
+> - **Errors:** PlayFlow already returns `{error, detail, status}`; surfaced via
+>   `PlayFlowAPIError` → normalized to `{ok: False, error, status, detail}`.
+> - **Params:** proper path / query / JSON body (not all-headers). Server identity is the
+>   `instance_id` path param; builds use `build_id`; lobbies use a `{config}` path segment and
+>   an `x-player-id` header for player-scoped ops.
+>
+> **Tool surface: 33 tools** — Servers (8), Builds (6), Projects (2), Lobbies/matchmaking (17).
+> Destructive tools (`stop_server`, `delete_build`, `upload_build`, `create_build_from_docker`,
+> `delete_lobby`) keep the `confirm=True` gate. The lobby SSE stream
+> (`/lobbies/{config}/me/events`) is intentionally not wrapped — a long-lived
+> `text/event-stream` connection can't be a request/response tool.
+>
+> **Code layout (revised):** `config.py` → `client.py` (single HTTP boundary, all v3 methods)
+> → `app.py` (shared `mcp`, `get_client`, `call`, `needs_confirmation`) → `tools/{servers,
+> builds,projects,lobbies}.py` (register tools) → `server.py` (`main()`). Tools were split by
+> resource because 33 tools in one file is unwieldy.
 
 ## Purpose
 
