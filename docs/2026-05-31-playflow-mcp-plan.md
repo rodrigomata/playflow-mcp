@@ -1,6 +1,15 @@
 # PlayFlow MCP Server Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **⚠️ Historical / superseded.** This plan describes the *original* build against a legacy
+> PlayFlow API generation (`api.cloud.playflow.app`, `token` header). The server was later
+> reconciled and retargeted to the current **v3** API — see
+> `2026-05-31-playflow-mcp-design.md` and the actual code under `src/playflow_mcp/` for the
+> shipped design. It is kept as a record of how the first iteration was built.
+>
+> **Note:** the "superpowers:*" references below are internal authoring-workflow tooling used
+> when this plan was written; they are not part of this repository and are not required to build
+> or use the server. To implement the plan, just follow the numbered tasks and their checkbox
+> (`- [ ]`) steps in order.
 
 **Goal:** A local FastMCP (Python) server that wraps the PlayFlow Cloud REST API so an agent can deploy, inspect, and tear down PlayFlow game servers, manage builds/tags, fetch logs/metrics, and manage matchmaking players.
 

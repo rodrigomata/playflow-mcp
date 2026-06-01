@@ -27,10 +27,13 @@ PLAYFLOW_API_KEY=pf_... uv run playflow-mcp
 
 ## Register with Claude Code
 
+Run this from the repository root (`$(pwd)` resolves to the cloned repo path; or substitute
+the absolute path to your clone):
+
 ```bash
 claude mcp add playflow \
   --env PLAYFLOW_API_KEY=pf_your_key_here \
-  -- uv run --directory /Users/rodrigomata/Documents/Development/playflow-mcp playflow-mcp
+  -- uv run --directory "$(pwd)" playflow-mcp
 ```
 
 ## Tools (33)
