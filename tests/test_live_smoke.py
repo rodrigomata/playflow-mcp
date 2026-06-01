@@ -9,7 +9,7 @@ _has_key = bool(os.environ.get("PLAYFLOW_API_KEY") or os.environ.get("PLAYFLOW_A
 
 pytestmark = pytest.mark.skipif(
     not (_has_key and os.environ.get("PLAYFLOW_LIVE_TESTS") == "1"),
-    reason="set PLAYFLOW_API_KEY and PLAYFLOW_LIVE_TESTS=1 to run live smoke tests",
+    reason="set PLAYFLOW_API_KEY (or legacy PLAYFLOW_API_TOKEN) and PLAYFLOW_LIVE_TESTS=1 to run live smoke tests",
 )
 
 

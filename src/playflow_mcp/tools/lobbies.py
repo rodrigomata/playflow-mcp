@@ -14,7 +14,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from ..app import call, get_client, mcp, needs_confirmation
+from ..app import call, get_client, invalid_args, mcp, needs_confirmation
 
 
 @mcp.tool()
@@ -98,6 +98,8 @@ def join_lobby(
 
     state: this player's initial state.
     """
+    if (lobby_id is None) == (code is None):
+        return invalid_args("Provide exactly one of lobby_id or code.")
     body: dict[str, Any] = {}
     if lobby_id is not None:
         body["lobbyId"] = lobby_id

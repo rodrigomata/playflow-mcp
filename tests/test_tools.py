@@ -55,6 +55,10 @@ class FakeClient:
         self.calls.append(("delete_lobby", config, lobby_id))
         return {"status": "lobby_deleted"}
 
+    def join_lobby(self, config, player_id, body):
+        self.calls.append(("join_lobby", config, player_id, body))
+        return {"id": "lob-1"}
+
 
 def use_fake(monkeypatch):
     fake = FakeClient()
@@ -170,3 +174,32 @@ def test_get_project_settings_passes_through(monkeypatch):
     out = projects.get_project_settings()
     assert out["ok"] is True
     assert ("get_project_settings",) in fake.calls
+
+
+# --- argument validation -------------------------------------------------
+
+
+def test_join_lobby_requires_exactly_one_of_id_or_code(monkeypatch):
+    fake = use_fake(monkeypatch)
+    both = lobbies.join_lobby("casual", "p1", lobby_id="lob-1", code="MEOW-42")
+    neither = lobbies.join_lobby("casual", "p1")
+    assert both["error"] == "invalid_arguments"
+    assert neither["error"] == "invalid_arguments"
+    assert fake.calls == []  # never reached the client
+
+
+def test_join_lobby_with_one_identifier_calls_client(monkeypatch):
+    fake = use_fake(monkeypatch)
+    out = lobbies.join_lobby("casual", "p1", code="MEOW-42")
+    assert out["ok"] is True
+    (_, _, _, body) = fake.calls[-1]
+    assert body == {"code": "MEOW-42"}
+
+
+def test_create_build_rejects_partial_credentials(monkeypatch):
+    fake = use_fake(monkeypatch)
+    out = builds.create_build_from_docker(
+        "img:tag", registry_username="u", confirm=True
+    )
+    assert out["error"] == "invalid_arguments"
+    assert fake.calls == []  # validation runs before the API call

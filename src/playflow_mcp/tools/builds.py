@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from ..app import call, get_client, mcp, needs_confirmation
+from ..app import call, get_client, invalid_args, mcp, needs_confirmation
 
 
 @mcp.tool()
@@ -59,12 +59,16 @@ def create_build_from_docker(
     image_url (required): full image URL with tag. registry_username/registry_password:
     only for private registries. Processing starts automatically; poll get_build(build_id).
     """
+    if (registry_username is None) != (registry_password is None):
+        return invalid_args(
+            "registry_username and registry_password must be provided together."
+        )
     if not confirm:
         return needs_confirmation("create_build_from_docker", name)
     body: dict[str, Any] = {"image_url": image_url, "name": name}
     if executable_path is not None:
         body["executable_path"] = executable_path
-    if registry_username is not None or registry_password is not None:
+    if registry_username is not None and registry_password is not None:
         body["registry_credentials"] = {
             "username": registry_username,
             "password": registry_password,
